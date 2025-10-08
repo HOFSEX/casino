@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простое Казино</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f0f0; text-align: center; padding: 20px; }
+        #balance { font-size: 24px; margin: 20px; }
+        button { padding: 10px 20px; font-size: 18px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:hover { background: #45a049; }
+        #result { margin-top: 20px; font-size: 20px; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Добро пожаловать в Казино!</h1>
+    <div id="balance">Баланс: 1000 coins</div>
+    <button id="playButton">Играть в Слот (ставка 10 coins)</button>
+    <div id="result"></div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();  // Разворачиваем на весь экран
+
+        // Получаем user_id (для будущего API)
+        const userId = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : 'guest';
+
+        // Начальный баланс (позже загружай с сервера)
+        let balance = 1000;
+        document.getElementById('balance').innerText = `Баланс: ${balance} coins`;
+
+        // Логика игры
+        document.getElementById('playButton').addEventListener('click', () => {
+            if (balance < 10) {
+                document.getElementById('result').innerText = 'Недостаточно coins!';
+                return;
+            }
+            
+            balance -= 10;  // Ставка
+            const winChance = Math.random();  // Рандом
+            let winAmount = 0;
+            if (winChance > 0.7) {
+                winAmount = Math.floor(Math.random() * 90) + 10;  // Выигрыш 10-100
+                balance += winAmount;
+                document.getElementById('result').innerText = `Вы выиграли ${winAmount} coins!`;
+            } else {
+                document.getElementById('result').innerText = 'Проигрыш. Попробуйте снова!';
+            }
+            
+            document.getElementById('balance').innerText = `Баланс: ${balance} coins`;
+            
+            // TODO: Отправь обновление баланса на сервер (через fetch к API бота)
+        });
+    </script>
+</body>
+</html>
